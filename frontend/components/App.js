@@ -6,6 +6,8 @@ import Message from "./Message";
 import ArticleForm from "./ArticleForm";
 import Spinner from "./Spinner";
 import axios from "axios";
+import { axiosWithAuth } from "../axios";
+const axiosAuth = axiosWithAuth();
 
 const articlesUrl = "http://localhost:9000/api/articles";
 const loginUrl = "http://localhost:9000/api/login";
@@ -46,7 +48,6 @@ export default function App() {
         password: password,
       })
       .then((res) => {
-        console.log(res);
         // On success, we should set the token to local storage in a 'token' key,
         localStorage.setItem("token", res.data.token);
         // put the server success message in its proper state, and redirect
@@ -61,12 +62,23 @@ export default function App() {
   const getArticles = () => {
     // ✨ implement
     // We should flush the message state, turn on the spinner
+    setMessage("");
+    setSpinnerOn(true);
     // and launch an authenticated request to the proper endpoint.
-    // On success, we should set the articles in their proper state and
-    // put the server success message in its proper state.
-    // If something goes wrong, check the status of the response:
-    // if it's a 401 the token might have gone bad, and we should redirect to login.
-    // Don't forget to turn off the spinner!
+    axiosAuth
+      .get("http://localhost:9000/api/articles")
+      // On success, we should set the articles in their proper state and
+      // put the server success message in its proper state.
+      .then((res) => {
+        console.log("articles", res);
+        setArticles(res.data.articles)
+        setMessage(res.data.message)
+      })
+      // If something goes wrong, check the status of the response:
+      // if it's a 401 the token might have gone bad, and we should redirect to login.
+      // Don't forget to turn off the spinner!
+      .catch((err) => console.log(err.response.status))
+      .finally(() => setSpinnerOn(false));
   };
 
   const postArticle = (article) => {
@@ -88,8 +100,8 @@ export default function App() {
   return (
     // ✨ fix the JSX: `Spinner`, `Message`, `LoginForm`, `ArticleForm` and `Articles` expect props ❗
     <React.StrictMode>
-      <Spinner on={spinnerOn}/>
-      <Message message={message}/>
+      <Spinner on={spinnerOn} />
+      <Message message={message} />
       <button id="logout" onClick={logout}>
         Logout from app
       </button>
@@ -112,7 +124,13 @@ export default function App() {
             element={
               <>
                 <ArticleForm />
-                <Articles />
+                <Articles
+                  getArticles={getArticles}
+                  deleteArticle={deleteArticle}
+                  currentArticleId={currentArticleId}
+                  setCurrentArticleId={setCurrentArticleId}
+                  articles={articles}
+                />
               </>
             }
           />

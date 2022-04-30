@@ -6,7 +6,6 @@ const initialFormValues = {
   password: "",
 };
 export default function LoginForm(props) {
-  console.log("props", props);
   const [values, setValues] = useState(initialFormValues);
   // ✨ where are my props? Destructure them here
   const { login } = props;
