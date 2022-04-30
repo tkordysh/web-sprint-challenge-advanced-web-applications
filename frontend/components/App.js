@@ -95,6 +95,16 @@ export default function App() {
 
   const deleteArticle = (article_id) => {
     // ✨ implement
+    setMessage('')
+    setSpinnerOn(true)
+    axiosAuth.delete(`http://localhost:9000/api/articles/${article_id}`)
+      .then(res => {
+        console.log(res)
+        setMessage(res.data.message)
+        setArticles(articles.filter(art => art.article_id !== article_id))
+      })
+      .catch(err => console.log(err))
+      .finally(() => setSpinnerOn(false))
   };
 
   return (
