@@ -7,7 +7,7 @@ import ArticleForm from "./ArticleForm";
 import Spinner from "./Spinner";
 import axios from "axios";
 import { axiosWithAuth } from "../axios";
-const axiosAuth = axiosWithAuth();
+
 
 const articlesUrl = "http://localhost:9000/api/articles";
 const loginUrl = "http://localhost:9000/api/login";
@@ -34,6 +34,9 @@ export default function App() {
     // and a message saying "Goodbye!" should be set in its proper state.
     // In any case, we should redirect the browser back to the login screen,
     // using the helper above.
+    localStorage.removeItem("token");
+    setMessage("Goodbye!");
+    redirectToLogin();
   };
 
   const login = ({ username, password }) => {
@@ -65,7 +68,7 @@ export default function App() {
     setMessage("");
     setSpinnerOn(true);
     // and launch an authenticated request to the proper endpoint.
-    axiosAuth
+    axiosWithAuth()
       .get("http://localhost:9000/api/articles")
       // On success, we should set the articles in their proper state and
       // put the server success message in its proper state.
@@ -86,7 +89,7 @@ export default function App() {
     setMessage("");
     setSpinnerOn(true);
     // The flow is very similar to the `getArticles` function.
-   return axiosAuth
+   return axiosWithAuth()
       .post("http://localhost:9000/api/articles", article)
       .then((res) => {
         setArticles([...articles, res.data.article]);
@@ -102,7 +105,7 @@ export default function App() {
     // You got this!
     setMessage("");
     setSpinnerOn(true);
-    return axiosAuth
+    return axiosWithAuth()
       .put(`http://localhost:9000/api/articles/${article_id}`, article)
       .then((res) => {
         setArticles(
@@ -119,7 +122,7 @@ export default function App() {
     // ✨ implement
     setMessage("");
     setSpinnerOn(true);
-    axiosAuth
+    axiosWithAuth()
       .delete(`http://localhost:9000/api/articles/${article_id}`)
       .then((res) => {
         console.log(res);
