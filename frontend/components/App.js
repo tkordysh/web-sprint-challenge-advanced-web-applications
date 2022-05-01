@@ -71,19 +71,28 @@ export default function App() {
       // put the server success message in its proper state.
       .then((res) => {
         console.log("articles", res);
-        setArticles(res.data.articles)
-        setMessage(res.data.message)
+        setArticles(res.data.articles);
+        setMessage(res.data.message);
       })
       // If something goes wrong, check the status of the response:
       // if it's a 401 the token might have gone bad, and we should redirect to login.
       // Don't forget to turn off the spinner!
-      .catch((err) => console.log(err.response.status))
+      .catch((err) => console.log(err))
       .finally(() => setSpinnerOn(false));
   };
 
   const postArticle = (article) => {
     // ✨ implement
+    setMessage("");
+    setSpinnerOn(true);
     // The flow is very similar to the `getArticles` function.
+   return axiosAuth
+      .post("http://localhost:9000/api/articles", article)
+      .then((res) => {
+        setArticles([...articles, res.data.article]);
+        setMessage(res.data.message);
+      })
+      .finally(() => setSpinnerOn(false));
     // You'll know what to do! Use log statements or breakpoints
     // to inspect the response from the server.
   };
@@ -91,21 +100,39 @@ export default function App() {
   const updateArticle = ({ article_id, article }) => {
     // ✨ implement
     // You got this!
+    setMessage("");
+    setSpinnerOn(true);
+    return axiosAuth
+      .put(`http://localhost:9000/api/articles/${article_id}`, article)
+      .then((res) => {
+        setArticles(
+          articles.map((art) =>
+            art.article_id === article_id ? res.data.article : art
+          )
+        );
+        setMessage(res.data.message);
+      })
+      .finally(() => setSpinnerOn(false));
   };
 
   const deleteArticle = (article_id) => {
     // ✨ implement
-    setMessage('')
-    setSpinnerOn(true)
-    axiosAuth.delete(`http://localhost:9000/api/articles/${article_id}`)
-      .then(res => {
-        console.log(res)
-        setMessage(res.data.message)
-        setArticles(articles.filter(art => art.article_id !== article_id))
+    setMessage("");
+    setSpinnerOn(true);
+    axiosAuth
+      .delete(`http://localhost:9000/api/articles/${article_id}`)
+      .then((res) => {
+        console.log(res);
+        setMessage(res.data.message);
+        setArticles(articles.filter((art) => art.article_id !== article_id));
       })
-      .catch(err => console.log(err))
-      .finally(() => setSpinnerOn(false))
+      .catch((err) => console.log(err))
+      .finally(() => setSpinnerOn(false));
   };
+
+  const currentArticle = articles.find(
+    (art) => art.article_id === currentArticleId
+  );
 
   return (
     // ✨ fix the JSX: `Spinner`, `Message`, `LoginForm`, `ArticleForm` and `Articles` expect props ❗
@@ -133,7 +160,12 @@ export default function App() {
             path="articles"
             element={
               <>
-                <ArticleForm />
+                <ArticleForm
+                  postArticle={postArticle}
+                  updateArticle={updateArticle}
+                  currentArticle={currentArticle}
+                  setCurrentArticleId={setCurrentArticleId}
+                />
                 <Articles
                   getArticles={getArticles}
                   deleteArticle={deleteArticle}
