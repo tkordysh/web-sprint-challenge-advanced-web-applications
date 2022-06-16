@@ -46,7 +46,7 @@ export default function App() {
     setSpinnerOn(true);
     // and launch a request to the proper endpoint.
     axios
-      .post(`http://localhost:9000/api/login`, {
+      .post(loginUrl, {
         username: username,
         password: password,
       })
@@ -69,7 +69,7 @@ export default function App() {
     setSpinnerOn(true);
     // and launch an authenticated request to the proper endpoint.
     axiosWithAuth()
-      .get("http://localhost:9000/api/articles")
+      .get(articlesUrl)
       // On success, we should set the articles in their proper state and
       // put the server success message in its proper state.
       .then((res) => {
